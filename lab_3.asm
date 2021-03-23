@@ -17,10 +17,10 @@ slash_n db  0Dh,0Ah,'$'
 flag db 1
 ten dw 10
 
-size equ 10
+size equ 8
 str db size DUP ('$') 
-size_array equ 5
-array dw size_array DUP (?)   
+size_array equ 3
+array dw size_array DUP (0)   
 current_element dw ? 
 
 .code
@@ -94,7 +94,11 @@ input_element proc
     ret 
     error2: 
        cmp di,1
-       je e  
+       je e
+       inc si
+       mov dl,[si]
+       cmp dl,0Dh
+       jne e  
        cmp ax,32768
        je end
        e:
@@ -134,8 +138,8 @@ type_seq proc
    cmp cx,1
    je m4  
    dec cx
-   mov di,0
-   mov si,0
+   mov di,2
+   mov si,2
    add si,2
    f:
        mov ax,array[di]
@@ -194,12 +198,12 @@ type_seq endp
 out_array proc
     pusha
     mov cx,size_array  
-    mov di,0
+    mov di,2
     while: 
        mov si,'$'
        push si 
        mov [flag],0   
-       sign:
+       sign: 
           mov ax,array[di] 
           cmp ax,0
           js negative
@@ -248,7 +252,7 @@ start:
     cmp cx,0
     je off
     mov ax,1 
-    mov di,0
+    mov di,2
     for:
         repeat:
            print_str message1
@@ -264,6 +268,7 @@ start:
            jmp repeat 
         add_element:
            print_str slash_n 
+           mov bx,0
            mov bx,current_element 
            mov array[di],bx
            add di,2
